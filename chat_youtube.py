@@ -5,46 +5,47 @@ from openai import OpenAI
 
 client = OpenAI(api_key="")
 
-caminho_pasta = 'referencias/youtube'
-resultados = []
-
 def analise_chat_youtube(caminho_pasta):
+    textos_extraidos = []
 
     for nome_arquivo in sorted(os.listdir(caminho_pasta)):
         if nome_arquivo.lower().endswith(('.png', '.jpg', '.jpeg')):
             caminho_completo = os.path.join(caminho_pasta, nome_arquivo)
-            print(f"Processando imagem: {nome_arquivo}")
+            print(f"📸 Processando imagem: {nome_arquivo}")
 
             imagem = Image.open(caminho_completo)
-            texto_extraido = pytesseract.image_to_string(imagem)
+            texto = pytesseract.image_to_string(imagem).strip()
+            if texto:
+                textos_extraidos.append(f"[{nome_arquivo}]\n{texto}\n")
 
-            prompt = f"""
-                O texto abaixo foi extraído de uma imagem relacionada a um vídeo do YouTube sobre basquete (títulos, comentários, descrições):
+    if not textos_extraidos:
+        print("⚠️ Nenhum texto foi extraído das imagens.")
+        return
 
-                \"\"\"{texto_extraido}\"\"\"
+    texto_completo = "\n\n".join(textos_extraidos)
 
-                Analise o conteúdo focando em:
-                - Principais temas abordados no vídeo (partidas, análises, curiosidades);
-                - Como o vídeo contribui para o conhecimento e interesse sobre basquete;
-                - Público-alvo e potencial impacto na comunidade de fãs;
-                - Qualquer insight sobre estratégias, técnicas ou histórias do basquete.
+    prompt = f"""
+    Abaixo está o conteúdo extraído de várias imagens de um canal do YouTube voltado para esportes:
 
-                Produza uma análise detalhada e informativa.
-                """
+    \"\"\"{texto_completo}\"\"\"
 
+    Com base nesses conteúdos, forneça uma análise geral:
+    - Quais são os formatos de vídeo mais recorrentes (cortes, resumos, análises, vlogs, bastidores);
+    - O estilo visual e de edição (thumbnails, cores, ritmo, cortes rápidos ou lentos, trilha sonora);
+    - A linguagem usada e o posicionamento do canal em relação à cultura esportiva atual;
+    - Como criadores de conteúdo esportivo podem se inspirar nesse canal para atrair audiência e se destacar.
+    """
 
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}],
+        max_tokens=1000
+    )
 
-            response = client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[{"role": "user", "content": prompt}],
-                max_tokens=500
-            )
+    resposta_gerada = response.choices[0].message.content.strip()
 
-            resposta_texto = response.choices[0].message.content.strip()
-            resultados.append(f"Análise GPT:\n{resposta_texto}\n\n")
+    caminho_saida = os.path.join(caminho_pasta, "info_youtube.txt")
+    with open(caminho_saida, "w", encoding="utf-8") as f:
+        f.write(resposta_gerada)
 
-
-    with open(os.path.join(caminho_pasta, "info_youtube.txt"), "w", encoding="utf-8") as f:
-        f.writelines(resultados)
-
-        print("✅ info_youtube.txt gerado com análises baseadas em texto OCR.")
+    print("info_youtube.txt gerado com análise única consolidada.")

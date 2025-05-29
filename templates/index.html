@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/style.css"> 
+    <title>Coletor de Referências Visuais</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --surface-color: #1e1e1e;
+            --primary-color: #bb86fc;
+            --secondary-color: #03dac6;
+            --text-primary: #e1e1e1;
+            --text-secondary: #a0a0a0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 2rem;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+        
+        h2 {
+            color: var(--secondary-color);
+            font-weight: 400;
+            margin: 2rem 0 1rem;
+            border-bottom: 1px solid #333;
+            padding-bottom: 0.5rem;
+        }
+        
+        form {
+            background-color: var(--surface-color);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        input, select, button {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #333;
+            border-radius: 4px;
+            background-color: #2d2d2d;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        select[multiple] {
+            height: auto;
+            min-height: 120px;
+            padding: 0;
+        }
+        
+        select[multiple] option {
+            padding: 0.5rem 1rem;
+            border-bottom: 1px solid #333;
+        }
+        
+        select[multiple] option:hover {
+            background-color: #3d3d3d;
+        }
+        
+        select[multiple] option:checked {
+            background-color: var(--primary-color);
+            color: #000;
+        }
+        
+        .select-container {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+        
+        .select-hint {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(187, 134, 252, 0.2);
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: #000;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            margin-top: 1rem;
+            padding: 0.85rem;
+        }
+        
+        button:hover {
+            background-color: #a370d4;
+        }
+        
+        @media (min-width: 600px) {
+            form {
+                padding: 2.5rem;
+            }
+            
+            .select-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Buscar Referências Visuais</h1>
+
+    <form method="POST" action="/">
+        <label for="pinterest">Pinterest</label>
+        <input type="text" id="pinterest" name="pinterest" placeholder="Digite o termo de busca" value="{{ pinterest or '' }}" />
+      
+        <div class="select-grid">
+            <div class="select-container">
+                <label for="instagram">Instagram</label>
+                <select id="instagram" name="instagram[]" multiple size="4">
+                    {% for account in instagram_accounts %}
+                        <option value="{{ account }}" {% if account in selecionados_instagram %}selected{% endif %}>{{ account }}</option>
+                    {% endfor %}
+                </select>
+                <div class="select-hint">Segure Ctrl/Cmd para selecionar múltiplos</div>
+            </div>
+            
+            <div class="select-container">
+                <label for="youtube">YouTube</label>
+                <select id="youtube" name="youtube[]" multiple size="4">
+                    {% for channel in youtube_channels %}
+                        <option value="{{ channel }}" {% if channel in selecionados_youtube %}selected{% endif %}>{{ channel }}</option>
+                    {% endfor %}
+                </select>
+                <div class="select-hint">Segure Ctrl/Cmd para selecionar múltiplos</div>
+            </div>
+        </div>
+      
+        <button type="submit">Buscar Referências</button>
+    </form>

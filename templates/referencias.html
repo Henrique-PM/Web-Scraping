@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coletor de Referências Visuais</title>
+    <style>
+        :root {
+    --bg-color: #121212;
+    --surface-color: #1e1e1e;
+    --primary-color: #bb86fc;
+    --secondary-color: #03dac6;
+    --text-primary: #e1e1e1;
+    --text-secondary: #a0a0a0;
+    --highlight-color: #292929;
+    --border-color: #333;
+}
+
+body {
+    font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    margin: 0 auto;
+    padding: 2rem;
+    max-width: 1200px;
+    line-height: 1.6;
+}
+
+/* Cabeçalho */
+.header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 3px solid var(--primary-color);
+    position: relative;
+}
+
+.header::after {
+    content: "";
+    position: absolute;
+    bottom: -3px;
+    left: 25%;
+    width: 50%;
+    height: 3px;
+    background: var(--secondary-color);
+}
+
+h1 {
+    color: var(--primary-color);
+    font-weight: 300;
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    color: var(--secondary-color);
+    font-weight: 400;
+    font-size: 1.2rem;
+    margin-top: 0;
+}
+
+/* Seções de tendências */
+.trends-section {
+    background-color: var(--surface-color);
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    margin-bottom: 2rem;
+    border-left: 4px solid var(--primary-color);
+}
+
+.trends-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.trends-title {
+    color: var(--primary-color);
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.trends-date {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.trends-content {
+    column-count: 2;
+    column-gap: 2rem;
+}
+
+.trend-item {
+    break-inside: avoid;
+    margin-bottom: 1.5rem;
+}
+
+.trend-item h4 {
+    color: var(--secondary-color);
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+}
+
+.trend-item p {
+    margin-top: 0;
+    text-align: justify;
+}
+
+/* Destaques */
+.highlight {
+    background-color: var(--highlight-color);
+    padding: 1.5rem;
+    border-radius: 6px;
+    margin: 2rem 0;
+    border-left: 4px solid var(--secondary-color);
+}
+
+.highlight h4 {
+    color: var(--primary-color);
+    margin-top: 0;
+}
+
+/* Galeria */
+.gallery {
+    margin-top: 1rem;
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1rem;
+}
+
+.gallery-item {
+    background-color: var(--bg-color);
+    padding: 1rem;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.gallery-image {
+    max-width: 100%;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+}
+
+.gallery-category {
+    color: var(--secondary-color);
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.gallery-info {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.empty-message {
+    color: var(--text-secondary);
+    font-style: italic;
+    text-align: center;
+    margin-top: 1rem;
+}
+
+/* Botão de download */
+.button-analise {
+    display: inline-block;
+    background-color: var(--primary-color);
+    color: #000;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    text-align: center;
+    font-weight: bold;
+    margin: 1rem 0;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.button-analise:hover {
+    background-color: var(--secondary-color);
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    .trends-content {
+        column-count: 1;
+    }
+}
+
+    </style>
+    <link rel="stylesheet" href="/static/style.css"> 
+</head>
+<body>
+    <div class="header">
+        <h1>Coletor de Referências Visuais</h1>
+        <p class="subtitle">Referências</p>
+        <div class="olympic-rings">
+            <div class="ring blue"></div>
+            <div class="ring yellow"></div>
+            <div class="ring black"></div>
+            <div class="ring green"></div>
+            <div class="ring red"></div>
+        </div>
+    </div>
+    
+    <!-- Seção de Tendências -->
+    <a href="/download" style="text-decoration: none;"><div class="button-analise" >Baixar</div></a>
+    
+    <div class="trends-section">
+        <div class="trends-header">
+            <h2 class="trends-title">Tendências Banner</h2>
+        </div>
+        <div class="gallery">
+            {% if imagens_posters %}
+                <div class="gallery-grid">
+                    {% for img_path in imagens_posters %}
+                    <div class="gallery-item">
+                        <span class="gallery-category">Pinterest</span>
+                        <img src="{{ url_for('referencias', filename=img_path) }}" alt="Poster capturado" class="gallery-image">
+                        <div class="gallery-info">
+                            <div>{{ img_path.split('/')[-1] }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-message">
+                    Nenhum poster capturado ainda. Busque por termos no Pinterest.
+                </div>
+            {% endif %}
+        </div>
+        {{referencias_posters}}   
+    </div>
+    <div class="trends-section">
+        <div class="trends-header">
+            <h2 class="trends-title">Tendências Redes Sociais</h2>
+        </div>
+        <div class="gallery">
+            {% if imagens_instagram %}
+                <div class="gallery-grid">
+                    {% for img_path in imagens_instagram %}
+                    <div class="gallery-item">
+                        <span class="gallery-category">Instagram</span>
+                        <img src="{{ url_for('referencias', filename=img_path) }}" alt="Rede social capturada" class="gallery-image">
+                        <div class="gallery-info">
+                            <div>{{ img_path.split('/')[-1] }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-message">
+                    Nenhuma rede social capturada ainda. Selecione contas do Instagram.
+                </div>
+            {% endif %}
+        </div>
+    
+        {{referencias_instagram}}       
+    </div>
+    <div class="trends-section">
+        <div class="trends-header">
+            <h2 class="trends-title">Tendências YouTube</h2>
+        </div>
+        <div class="gallery">
+            {% if imagens_youtube %}
+                <div class="gallery-grid">
+                    {% for img_path in imagens_youtube %}
+                    <div class="gallery-item">
+                        <span class="gallery-category">YouTube</span>
+                        <img src="{{ url_for('referencias', filename=img_path) }}" alt="YouTube capturado" class="gallery-image">
+                        <div class="gallery-info">
+                            <div>{{ img_path.split('/')[-1] }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-message">
+                    Nenhum canal do YouTube capturado ainda. Selecione canais do YouTube.
+                </div>
+            {% endif %}
+        </div>
+        {{referencias_youtube}}       
+    </div>
+</body>
+</html>

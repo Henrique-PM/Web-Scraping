@@ -5,45 +5,47 @@ from openai import OpenAI
 
 client = OpenAI(api_key="")
 
-caminho_pasta = 'referencias/posters'
-resultados = []
-
 def analise_chat_posters(caminho_pasta):
+    textos_extraidos = []
 
     for nome_arquivo in sorted(os.listdir(caminho_pasta)):
         if nome_arquivo.lower().endswith(('.png', '.jpg', '.jpeg')):
             caminho_completo = os.path.join(caminho_pasta, nome_arquivo)
-            print(f"Processando imagem: {nome_arquivo}")
+            print(f"🖼️ Processando imagem: {nome_arquivo}")
 
             imagem = Image.open(caminho_completo)
-            texto_extraido = pytesseract.image_to_string(imagem)
+            texto = pytesseract.image_to_string(imagem).strip()
+            if texto:
+                textos_extraidos.append(f"[{nome_arquivo}]\n{texto}\n")
 
-            prompt = f"""
-                Você recebeu o seguinte texto extraído de uma imagem relacionada a basquete, como uma notícia, análise ou estatística:
+    if not textos_extraidos:
+        print("⚠️ Nenhum texto extraído das imagens.")
+        return
 
-                \"\"\"{texto_extraido}\"\"\"
+    texto_completo = "\n\n".join(textos_extraidos)
 
-                Por favor, faça uma análise detalhada considerando:
-                - A performance dos times e jogadores mencionados;
-                - Estratégias e táticas evidenciadas;
-                - Impacto e reação da torcida e da comunidade do basquete;
-                - Tendências e aspectos culturais do esporte destacados.
+    prompt = f"""
+    Abaixo está o texto extraído de várias imagens relacionadas ao esporte:
 
-                Responda com insights claros e relevantes para quem acompanha basquete.
-                """
+    \"\"\"{texto_completo}\"\"\"
 
+    Com base nesse conteúdo, faça uma análise única e abrangente sobre:
+    - As tendências de design gráfico esportivo observadas;
+    - Os elementos visuais que se destacam e seu impacto na comunicação (tipografia, cores, composição, emoção);
+    - A influência potencial desses estilos em diferentes mídias (TV, redes sociais, ambientes físicos);
+    - O que esses materiais sugerem sobre a cultura esportiva contemporânea.
+    """
 
-            response = client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[{"role": "user", "content": prompt}],
-                max_tokens=500
-            )
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}],
+        max_tokens=1000
+    )
 
-            resposta_texto = response.choices[0].message.content.strip()
-            resultados.append(f"Análise GPT:\n{resposta_texto}\n\n")
+    resposta_gerada = response.choices[0].message.content.strip()
 
+    caminho_saida = os.path.join(caminho_pasta, "info_posters.txt")
+    with open(caminho_saida, "w", encoding="utf-8") as f:
+        f.write(resposta_gerada)
 
-    with open(os.path.join(caminho_pasta, "info_posters.txt"), "w", encoding="utf-8") as f:
-        f.writelines(resultados)
-
-        print("✅ info_posters.txt gerado com análises baseadas em texto OCR.")
+    print("Análise única gerada e salva em info_posters.txt")
